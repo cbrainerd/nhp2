@@ -1,7 +1,7 @@
-from typing import List
+from typing import Set
 
 class Truck:
     def __init__(self, id: int):
         self.id = id
         self.driver: int = None
-        self.route: List[str] = None
+        self.packages: Set[str] = set()

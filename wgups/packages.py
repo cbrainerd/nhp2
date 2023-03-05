@@ -36,7 +36,7 @@ class Packages:
                     deadline = datetime.time(deadline.tm_hour, deadline.tm_min)
 
                 if constraint_description:
-                    constraint = Constraint(constraint_description)
+                    constraint = Constraint(from_description=constraint_description)
                 else:
                     constraint = None
 

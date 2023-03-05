@@ -24,3 +24,13 @@ def test_package_22(packages):
     assert package.deadline == datetime.time(23, 59)
     assert package.mass == 2
     assert package.constraint is None
+
+
+def test_package_3_constraint(packages):
+    package = packages.get(3)
+    assert package.constraint.assign_truck == 2
+
+
+def test_package_14_constraint(packages):
+    package = packages.get(14)
+    assert package.constraint.with_packages == {15, 19}
