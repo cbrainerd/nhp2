@@ -24,5 +24,14 @@ class Package:
         self.mass = mass
         self.constraint = constraint
 
+        self.delivery_time: datetime.time = None
+        self.delivery_truck: datetime.time = None
+
     def get_address(self):
         return f"{self.address} {self.zip}"
+
+    def mark_delivered(self, delivery_time, delivery_truck):
+        self.delivery_time = delivery_time
+        self.delivery_truck = delivery_truck
+        if delivery_time > self.deadline:
+            print(f"Package {self.id} was LATE! Due at {self.deadline} delivered at {delivery_time}")

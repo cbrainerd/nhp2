@@ -48,3 +48,17 @@ class Packages:
 
     def __getitem__(self, id):
         return self._packages[id]
+
+    def items(self):
+        return self._packages.items()
+    
+    def ready_to_load(self, current_time):
+        """Packages that are ready for pick up the current time and not already loaded on a truck"""
+        ready = list()
+        for package in self.items():
+            if package.delivery_truck is not None:
+                continue
+            if package.constraint and package.constraint.earliest_pickup and package.constraint.earliest_pickup < current_time:
+                continue
+            ready.append(package)
+        return ready

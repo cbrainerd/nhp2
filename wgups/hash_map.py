@@ -76,3 +76,10 @@ class HashMap:
             repr += f"'{key}': {self.__getitem__(key)}, "
         repr += "}"
         return repr
+
+    def items(self):
+        all_items = set()
+        for bucket in self._buckets:
+            bucket_values = [item.value for item in bucket]
+            all_items.update(bucket_values)
+        return all_items
