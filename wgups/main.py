@@ -29,10 +29,11 @@ class Scheduler:
     def __init__(self):
         self.distance_table = DistanceTable()
         self.packages = Packages()
-        self.trucks = [Truck(id) for id in range(1, 2)]
+        self.trucks = [Truck(id) for id in range(1, 3)]
 
     def load_packages(self):
-        self.trucks[0].packages = [self.packages[i] for i in range(1, 41)]
+        self.trucks[0].packages = [self.packages[i] for i in range(1, 21)]
+        self.trucks[1].packages = [self.packages[i] for i in range(21, 41)]
 
     def deliver_packages(self, truck: Truck):
         distance_travelled = 0.0
@@ -46,12 +47,15 @@ class Scheduler:
             current_location = destination
             distance_travelled += distance
             print(
-                f"Truck delivered package ID {package.id} to {package.address} at {arrival_time} total distance {round(distance_travelled, 1)}"
+                f"Truck {truck.id} delivered package {package.id} to {package.address} at {arrival_time} total distance {round(distance_travelled, 1)}"
             )
 
     def main(self):
         self.load_packages()
+        print("Truck 1 -----------------------------------------")
         self.deliver_packages(self.trucks[0])
+        print("Truck 2 -----------------------------------------")
+        self.deliver_packages(self.trucks[1])
 
 
 def main():
