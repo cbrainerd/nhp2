@@ -1,19 +1,22 @@
 from collections import namedtuple
-
+from typing import Callable
 
 Item = namedtuple("Item", "key value")
-    
+
 
 class HashMap:
-
-    def __init__(self, size: int = 10):
+    def __init__(self, size: int = 10, default: Callable = None):
         self.size = size
+        self._default = default
         # Initialize an empty hash map
         self._buckets = [list()] * size
 
+    def set_default(self,default: Callable):
+        self._default = default
+
     def _index(self, key):
         return hash(key) % self.size
-    
+
     def _bucket(self, key):
         return self._buckets[self._index(key)]
 
@@ -33,6 +36,10 @@ class HashMap:
             if item.key == key:
                 return item.value
         else:
+            if self._default is not None:
+                default_value = self._default()
+                self.__setitem__(key, default_value)
+                return default_value
             raise KeyError(key)
 
     def __contains__(self, key):
@@ -62,3 +69,10 @@ class HashMap:
             bucket_keys = [item.key for item in bucket]
             all_keys.update(bucket_keys)
         return all_keys
+
+    def __repr__(self):
+        repr = "{"
+        for key in self.keys():
+            repr += f"'{key}': {self.__getitem__(key)}, "
+        repr += "}"
+        return repr
