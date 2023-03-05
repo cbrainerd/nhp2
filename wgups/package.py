@@ -1,4 +1,4 @@
-from datetime import time
+import datetime
 
 from wgups.constraint import Constraint
 
@@ -10,7 +10,7 @@ class Package:
         city: str,
         state: str,
         zip: str,  # String to allow zip+4
-        delivery_deadline: time,
+        deadline: datetime.time,
         mass: float,
         constraint: Constraint = None,
     ):
@@ -19,6 +19,6 @@ class Package:
         self.city = city
         self.state = state
         self.zip = zip
-        self.delivery_deadline = delivery_deadline
+        self.deadline = deadline
         self.mass = mass
         self.constraint = constraint

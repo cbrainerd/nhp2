@@ -22,7 +22,6 @@ class DistanceTable:
         with open(data_path, "r", encoding="utf-8") as csv_file:
             data = reader(csv_file)
             addresses = list()
-            print("")
             for row in data:
                 start_address = " ".join(rgx_address.match(row.pop(0)).groups())
                 addresses.append(start_address)
