@@ -1,5 +1,6 @@
 from typing import Set
 
+
 class Truck:
     def __init__(self, id: int):
         self.id = id

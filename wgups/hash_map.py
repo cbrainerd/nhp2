@@ -11,7 +11,7 @@ class HashMap:
         # Initialize an empty hash map
         self._buckets = [list()] * size
 
-    def set_default(self,default: Callable):
+    def set_default(self, default: Callable):
         self._default = default
 
     def _index(self, key):

@@ -9,6 +9,7 @@ from wgups.packages import Packages
 def packages():
     return Packages()
 
+
 def test_packages(packages):
     for i in range(1, 41):
         assert i in packages._packages

@@ -16,12 +16,22 @@ def distance_table():
 
 def test_same_dest(distance_table):
     assert distance_table.get_distance(HUB, HUB) == 0.0
-    assert distance_table.get_distance(WHEELER_HISTORIC_FARM, WHEELER_HISTORIC_FARM) == 0.0
-    assert distance_table.get_distance(WEST_VALLEY_PROSECUTOR, WEST_VALLEY_PROSECUTOR) == 0.0
+    assert (
+        distance_table.get_distance(WHEELER_HISTORIC_FARM, WHEELER_HISTORIC_FARM) == 0.0
+    )
+    assert (
+        distance_table.get_distance(WEST_VALLEY_PROSECUTOR, WEST_VALLEY_PROSECUTOR)
+        == 0.0
+    )
+
 
 def test_reverse(distance_table):
     assert distance_table.get_distance(HUB, WHEELER_HISTORIC_FARM) == 3.6
     assert distance_table.get_distance(WHEELER_HISTORIC_FARM, HUB) == 3.6
 
+
 def test_long(distance_table):
-    assert distance_table.get_distance(WEST_VALLEY_PROSECUTOR, WHEELER_HISTORIC_FARM) == 13.6
+    assert (
+        distance_table.get_distance(WEST_VALLEY_PROSECUTOR, WHEELER_HISTORIC_FARM)
+        == 13.6
+    )

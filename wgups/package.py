@@ -2,6 +2,7 @@ import datetime
 
 from wgups.constraint import Constraint
 
+
 class Package:
     def __init__(
         self,

@@ -4,7 +4,8 @@ from typing import Set
 
 
 RGX_EARLIEST_PICKUP = re.compile(r"until [0-9]{1,2}:[0-9]{2} [aMpP][mM]")
-RGX_TIME= re.compile(r"([0-9]{1,2}):([0-9]{2}) ([aMpP][mM])")
+RGX_TIME = re.compile(r"([0-9]{1,2}):([0-9]{2}) ([aMpP][mM])")
+
 
 class Constraint:
     def __init__(
@@ -31,7 +32,7 @@ class Constraint:
                 with_packages = set([int(id) for id in ids.split(",")])
             else:
                 raise ValueError(f"Could not interpret '{from_description}'")
-            
+
         self.assign_truck = assign_truck
         self.earliest_pickup = earliest_pickup
         self.with_packages = with_packages

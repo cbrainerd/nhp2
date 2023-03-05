@@ -12,9 +12,18 @@ TRUCK_MPH = 18
 
 def get_arrival_time(distance, velocity, start_time: datetime.time) -> datetime.time:
     duration = distance / velocity
-    start_datetime = datetime.datetime(2000, 1, 1, start_time.hour, start_time.minute, start_time.second, start_time.microsecond)
+    start_datetime = datetime.datetime(
+        2000,
+        1,
+        1,
+        start_time.hour,
+        start_time.minute,
+        start_time.second,
+        start_time.microsecond,
+    )
     end_datetime = start_datetime + datetime.timedelta(hours=duration)
     return end_datetime.time()
+
 
 class Scheduler:
     def __init__(self):
@@ -36,7 +45,9 @@ class Scheduler:
             current_time = arrival_time
             current_location = destination
             distance_travelled += distance
-            print(f"Truck delivered package ID {package.id} to {package.address} at {arrival_time} total distance {round(distance_travelled, 1)}")
+            print(
+                f"Truck delivered package ID {package.id} to {package.address} at {arrival_time} total distance {round(distance_travelled, 1)}"
+            )
 
     def main(self):
         self.load_packages()

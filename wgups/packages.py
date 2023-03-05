@@ -9,11 +9,11 @@ from wgups.package import Package
 
 
 class Packages:
-
     def __init__(self, data_path=None):
         if data_path is None:
-            data_path = os.path.join(os.path.dirname(__file__), "data", "package_table.csv")
-
+            data_path = os.path.join(
+                os.path.dirname(__file__), "data", "package_table.csv"
+            )
 
         with open(data_path, "r", encoding="utf-8") as csv_file:
             data = reader(csv_file)
@@ -39,11 +39,12 @@ class Packages:
                 else:
                     constraint = None
 
-                self._packages[id] = Package(id, address, city, state, zip, deadline, mass, constraint)
+                self._packages[id] = Package(
+                    id, address, city, state, zip, deadline, mass, constraint
+                )
 
     def get(self, id):
         return self.__getitem__(id)
-    
+
     def __getitem__(self, id):
         return self._packages[id]
-        
