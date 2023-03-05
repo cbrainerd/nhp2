@@ -28,7 +28,6 @@ class DistanceTable:
                 for address in addresses:
                     # Store distance for each address we've already seen. 
                     self._distance_table[start_address][address] = float(row.pop(0))
-                    print(f"{start_address} to {address} is {self._distance_table[start_address][address]}")
 
         # Table loading is done, don't create any more default entries.           
         self._distance_table.set_default(None)

@@ -19,7 +19,6 @@ class Packages:
             data = reader(csv_file)
             self._packages = HashMap()
             for package in data:
-                print(package)
                 id = int(package.pop(0))
                 address = package.pop(0)
                 city = package.pop(0)
@@ -43,4 +42,8 @@ class Packages:
                 self._packages[id] = Package(id, address, city, state, zip, deadline, mass, constraint)
 
     def get(self, id):
+        return self.__getitem__(id)
+    
+    def __getitem__(self, id):
         return self._packages[id]
+        

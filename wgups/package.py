@@ -22,3 +22,6 @@ class Package:
         self.deadline = deadline
         self.mass = mass
         self.constraint = constraint
+
+    def get_address(self):
+        return f"{self.address} {self.zip}"
