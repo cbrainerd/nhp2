@@ -58,7 +58,7 @@ class Packages:
         for package in self.items():
             if package.delivery_truck is not None:
                 continue
-            if package.constraint and package.constraint.earliest_pickup and package.constraint.earliest_pickup < current_time:
+            if current_time < package.earliest_load():
                 continue
             ready.append(package)
         return ready

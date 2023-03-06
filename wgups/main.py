@@ -32,20 +32,27 @@ class Scheduler:
         self.trucks = [Truck(id) for id in range(1, NUM_TRUCKS + 1)]
 
     def load_packages(self, truck, current_time):
+        print(f"Loading truck {truck.id} at {current_time}")
+        early_load = False
         try:
             for package in self.packages.ready_to_load(current_time):
                 if package.deadline < datetime.time(10, 30):
-                    truck.load_package(package)
+                    truck.load_package(package, current_time)
+                    early_load = True
 
             for package in self.packages.ready_to_load(current_time):
                 if package.deadline < datetime.time(23, 59):
                     if hash(package.id) % NUM_TRUCKS + 1 == truck.id:
-                        truck.load_package(package)
+                        truck.load_package(package, current_time)
+                        early_load = True
 
-            if current_time > datetime.time(10, 30):
-                for package in self.packages.ready_to_load(current_time):
-                    if hash(package.id) % NUM_TRUCKS + 1 == truck.id:
-                        truck.load_package(package)
+            if early_load:
+                print("Early morning deliveries load, leaving depot")
+                return
+            
+            for package in self.packages.ready_to_load(current_time):
+                if hash(package.id) % NUM_TRUCKS + 1 == truck.id:
+                    truck.load_package(package, current_time)
         
         except TruckFullException:
             print(f"Truck {truck.id} is fully loaded.")
@@ -67,14 +74,17 @@ class Scheduler:
                 destination = package.get_address()
                 distance = self.distance_table.get_distance(current_location, destination)
                 arrival_time = get_arrival_time(distance, TRUCK_MPH, current_time)
-                package.mark_delivered(arrival_time, truck.id)
-                truck.packages.remove(package)
+
+                
+                truck.deliver_package(package, arrival_time)
+
                 current_time = arrival_time
                 current_location = destination
                 distance_traveled += distance
                 print(
                     f"Truck {truck.id} delivered package {package.id} to {package.address} at {arrival_time} total distance {round(distance_traveled, 1)}"
                 )
+            truck.packages.clear()
             distance = self.distance_table.get_distance(current_location, HUB)
             arrival_time = get_arrival_time(distance, TRUCK_MPH, current_time)
             current_time = arrival_time

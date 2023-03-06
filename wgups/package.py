@@ -35,3 +35,9 @@ class Package:
         self.delivery_truck = delivery_truck
         if delivery_time > self.deadline:
             print(f"Package {self.id} was LATE! Due at {self.deadline} delivered at {delivery_time}")
+
+    def earliest_load(self):
+        if not self.constraint or self.constraint.earliest_pickup is None:
+            return datetime.time(0, 0)
+        else:
+            return self.constraint.earliest_pickup
