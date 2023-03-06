@@ -10,14 +10,14 @@ RGX_TIME = re.compile(r"([0-9]{1,2}):([0-9]{2}) ([aMpP][mM])")
 class Constraint:
     def __init__(
         self,
-        assign_truck: int = None,
+        assigned_truck: int = None,
         earliest_pickup: datetime.time = None,
         with_packages: Set[int] = None,
         from_description: str = None,
     ):
         if from_description is not None:
             if from_description.startswith("Can only be on truck"):
-                assign_truck = int(from_description.split(" ")[-1])
+                assigned_truck = int(from_description.split(" ")[-1])
             elif RGX_EARLIEST_PICKUP.search(from_description):
                 hour, minute, ampm = RGX_TIME.search(from_description).groups()
                 hour = int(hour)
@@ -33,6 +33,6 @@ class Constraint:
             else:
                 raise ValueError(f"Could not interpret '{from_description}'")
 
-        self.assign_truck = assign_truck
+        self.assigned_truck = assigned_truck
         self.earliest_pickup = earliest_pickup
         self.with_packages = with_packages

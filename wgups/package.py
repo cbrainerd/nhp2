@@ -22,6 +22,9 @@ class Package:
         self.zip = zip
         self.deadline = deadline
         self.mass = mass
+
+        if constraint is None:
+            constraint = Constraint()
         self.constraint = constraint
 
         self.delivery_time: datetime.time = None
@@ -36,8 +39,23 @@ class Package:
         if delivery_time > self.deadline:
             print(f"Package {self.id} was LATE! Due at {self.deadline} delivered at {delivery_time}")
 
+    @property
     def earliest_load(self):
         if not self.constraint or self.constraint.earliest_pickup is None:
             return datetime.time(0, 0)
         else:
             return self.constraint.earliest_pickup
+
+    @property
+    def assigned_truck(self):
+        if not self.constraint or self.constraint.assigned_truck is None:
+            return None
+        else:
+            return self.constraint.assigned_truck
+        
+    @property
+    def with_packages(self):
+        if not self.constraint or self.constraint.with_packages is None:
+            return None
+        else:
+            return self.constraint.with_packages

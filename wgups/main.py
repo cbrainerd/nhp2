@@ -42,17 +42,21 @@ class Scheduler:
 
             for package in self.packages.ready_to_load(current_time):
                 if package.deadline < datetime.time(23, 59):
-                    if hash(package.id) % NUM_TRUCKS + 1 == truck.id:
+                    if hash(package.id) % NUM_TRUCKS + 1 == truck.id or package.assigned_truck == truck.id:
                         truck.load_package(package, current_time)
                         early_load = True
 
             if early_load:
-                print("Early morning deliveries load, leaving depot")
                 return
             
             for package in self.packages.ready_to_load(current_time):
-                if hash(package.id) % NUM_TRUCKS + 1 == truck.id:
+                if package.assigned_truck == truck.id:
                     truck.load_package(package, current_time)
+                elif hash(package.id) % NUM_TRUCKS + 1 == truck.id:
+                    truck.load_package(package, current_time)
+
+
+
         
         except TruckFullException:
             print(f"Truck {truck.id} is fully loaded.")

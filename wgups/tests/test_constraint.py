@@ -5,7 +5,7 @@ from wgups.constraint import Constraint
 
 def test_truck():
     constraint = Constraint(from_description="Can only be on truck 2")
-    assert constraint.assign_truck == 2
+    assert constraint.assigned_truck == 2
 
 
 def test_earliest_pickup():
