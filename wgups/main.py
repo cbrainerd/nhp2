@@ -71,6 +71,7 @@ class Scheduler:
                 print(f"Nothing to deliver, it's quitting time for truck {truck.id}")
                 break
             for package in truck.packages:
+                # TODO: pick packages smartly instead of sequentially
                 destination = package.get_address()
                 distance = self.distance_table.get_distance(current_location, destination)
                 arrival_time = get_arrival_time(distance, TRUCK_MPH, current_time)
@@ -93,13 +94,16 @@ class Scheduler:
             print(
                 f"Truck {truck.id} returned to HUB at {arrival_time} total distance {round(distance_traveled, 1)}"
             )
+        return distance_traveled
         
 
     def main(self):
+        total_distance = 0
         print("Truck 1 -----------------------------------------")
-        self.deliver_packages(self.trucks[0])
+        total_distance += self.deliver_packages(self.trucks[0])
         print("Truck 2 -----------------------------------------")
-        self.deliver_packages(self.trucks[1])
+        total_distance += self.deliver_packages(self.trucks[1])
+        print(f"Total distance traveled {total_distance} miles")
 
 
 def main():
