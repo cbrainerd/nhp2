@@ -36,8 +36,6 @@ class Package:
     def mark_delivered(self, delivery_time, delivery_truck):
         self.delivery_time = delivery_time
         self.delivery_truck = delivery_truck
-        if delivery_time > self.deadline:
-            print(f"Package {self.id} was LATE! Due at {self.deadline} delivered at {delivery_time}")
 
     @property
     def earliest_load(self):
@@ -52,10 +50,24 @@ class Package:
             return None
         else:
             return self.constraint.assigned_truck
-        
+
     @property
     def with_packages(self):
         if not self.constraint or self.constraint.with_packages is None:
             return None
         else:
             return self.constraint.with_packages
+
+    def __str__(self):
+        if self.delivery_time is not None:
+            status = f"delivered by truck {self.delivery_truck} at {self.delivery_time}"
+            if self.delivery_time > self.deadline:
+                status += " *LATE*"
+        elif self.delivery_time is None and self.delivery_truck is not None:
+            status = f"enroute on truck {self.delivery_truck} for delivery by {self.deadline}"
+        elif self.delivery_truck is None:
+            status = f"at HUB"
+        return f"{self.id} - {status}"
+
+    def __repr__(self):
+        return self.__str__()

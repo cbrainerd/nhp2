@@ -47,10 +47,13 @@ class Packages:
         # Ensure all grouped packages are loaded in the same truck.
         for package_id in self._packages.keys():
             if self._packages[package_id].with_packages is not None:
-                self._packages[package_id].constraint.assigned_truck = GROUPED_PACKAGE_TRUCK
+                self._packages[
+                    package_id
+                ].constraint.assigned_truck = GROUPED_PACKAGE_TRUCK
                 for with_package_id in self._packages[package_id].with_packages:
-                    self._packages[with_package_id].constraint.assigned_truck = GROUPED_PACKAGE_TRUCK
-                
+                    self._packages[
+                        with_package_id
+                    ].constraint.assigned_truck = GROUPED_PACKAGE_TRUCK
 
     def get(self, id):
         return self.__getitem__(id)
@@ -60,7 +63,7 @@ class Packages:
 
     def items(self):
         return self._packages.items()
-    
+
     def ready_to_load(self, current_time):
         """Packages that are ready for pick up the current time and not already loaded on a truck"""
         ready = list()
@@ -71,3 +74,8 @@ class Packages:
                 continue
             ready.append(package)
         return ready
+
+    def print_all(self):
+        for package_id in sorted(list(self._packages.keys())):
+            package = self._packages[package_id]
+            print(f"{package}")

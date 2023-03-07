@@ -1,112 +1,111 @@
 # Chris Brainerd / Student ID: 010438858
 
 import datetime
+from typing import List
 
 from wgups.distance_table import DistanceTable
+from wgups.package import Package
 from wgups.packages import Packages
+from wgups.time import add_time
 from wgups.truck import Truck, TruckFullException
 
-HUB = "4001 South 700 East 84107"
-TRUCK_MPH = 18
-NUM_TRUCKS = 2
 
-def get_arrival_time(distance, velocity, start_time: datetime.time) -> datetime.time:
-    duration = distance / velocity
-    start_datetime = datetime.datetime(
-        2000,
-        1,
-        1,
-        start_time.hour,
-        start_time.minute,
-        start_time.second,
-        start_time.microsecond,
-    )
-    end_datetime = start_datetime + datetime.timedelta(hours=duration)
-    return end_datetime.time()
+HUB = "4001 South 700 East 84107"
+NUM_TRUCKS = 2
+RUSH_THRESHOLD = 30
 
 
 class Scheduler:
     def __init__(self):
         self.distance_table = DistanceTable()
         self.packages = Packages()
-        self.trucks = [Truck(id) for id in range(1, NUM_TRUCKS + 1)]
+        self.trucks = [
+            Truck(id, HUB, datetime.time(8, 0)) for id in range(1, NUM_TRUCKS + 1)
+        ]
+        self.trucks[1].current_time = datetime.time(8, 0)
 
-    def load_packages(self, truck, current_time):
-        print(f"Loading truck {truck.id} at {current_time}")
-        early_load = False
+    def load_packages(self, truck):
+        print(f"Loading truck {truck.id} at {truck.current_time}")
         try:
-            for package in self.packages.ready_to_load(current_time):
+            for package in self.packages.ready_to_load(truck.current_time):
                 if package.deadline < datetime.time(10, 30):
-                    truck.load_package(package, current_time)
-                    early_load = True
+                    truck.load_package(package, truck.current_time)
 
-            for package in self.packages.ready_to_load(current_time):
+            for package in self.packages.ready_to_load(truck.current_time):
                 if package.deadline < datetime.time(23, 59):
-                    if hash(package.id) % NUM_TRUCKS + 1 == truck.id or package.assigned_truck == truck.id:
-                        truck.load_package(package, current_time)
-                        early_load = True
+                    if package.assigned_truck is not None:
+                        if package.assigned_truck == truck.id:
+                            truck.load_package(package, truck.current_time)
+                        else:
+                            continue
+                    else:
+                        truck.load_package(package, truck.current_time)
 
-            if early_load:
-                return
-            
-            for package in self.packages.ready_to_load(current_time):
+            for package in self.packages.ready_to_load(truck.current_time):
                 if package.assigned_truck == truck.id:
-                    truck.load_package(package, current_time)
-                elif hash(package.id) % NUM_TRUCKS + 1 == truck.id:
-                    truck.load_package(package, current_time)
+                    truck.load_package(package, truck.current_time)
+                else:
+                    truck.load_package(package, truck.current_time)
 
-
-
-        
         except TruckFullException:
             print(f"Truck {truck.id} is fully loaded.")
 
+    def choose_closest_package(self, origin, packages) -> Package:
+        min_distance = 9999999
+        closest_package = None
+        for package in packages:
+            distance = self.distance_table.get_distance(origin, package.get_address())
+            if distance < min_distance:
+                min_distance = distance
+                closest_package = package
+        return closest_package
+    
+    def choose_earliest_packages(self, packages) -> List[Package]:
+        earliest_deadline = datetime.time(23, 59, 59)
+        earliest_packages = list()
+        for package in packages:
+            if package.deadline < earliest_deadline:
+                earliest_deadline = package.deadline
+                earliest_packages = [package]
+            elif package.deadline == earliest_deadline:
+                earliest_packages.append(package)
+        return earliest_packages
 
+    def choose_next(self, origin, packages, current_time):
+        earliest_packages = self.choose_earliest_packages(packages)
+        if add_time(current_time, datetime.timedelta(minutes=RUSH_THRESHOLD)) > earliest_packages[0].deadline:
+            print(f"  RUSH for deadline {earliest_packages[0].deadline} {earliest_packages}")
+            candidate_packages = earliest_packages
+        else:
+            candidate_packages = packages
+        closest_package = self.choose_closest_package(origin, candidate_packages)
+        return closest_package
 
-
-
-    def deliver_packages(self, truck: Truck):
-        distance_traveled = 0.0
-        current_time = datetime.time(8, 0)
-        current_location = HUB
+    def deliver_packages(self, trucks: List[Truck]):
         while True:
-            self.load_packages(truck, current_time)
-            if len(truck.packages) == 0:
-                print(f"Nothing to deliver, it's quitting time for truck {truck.id}")
+            for truck in trucks:
+                self.load_packages(truck)
+
+            if sum(len(truck.packages) for truck in trucks) == 0:
+                # No packages loaded on trucks.
                 break
-            for package in truck.packages:
-                # TODO: pick packages smartly instead of sequentially
-                destination = package.get_address()
-                distance = self.distance_table.get_distance(current_location, destination)
-                arrival_time = get_arrival_time(distance, TRUCK_MPH, current_time)
 
-                
-                truck.deliver_package(package, arrival_time)
-
-                current_time = arrival_time
-                current_location = destination
-                distance_traveled += distance
-                print(
-                    f"Truck {truck.id} delivered package {package.id} to {package.address} at {arrival_time} total distance {round(distance_traveled, 1)}"
-                )
-            truck.packages.clear()
-            distance = self.distance_table.get_distance(current_location, HUB)
-            arrival_time = get_arrival_time(distance, TRUCK_MPH, current_time)
-            current_time = arrival_time
-            current_location = HUB
-            distance_traveled += distance
-            print(
-                f"Truck {truck.id} returned to HUB at {arrival_time} total distance {round(distance_traveled, 1)}"
-            )
-        return distance_traveled
-        
+            for truck in trucks:
+                    while len(truck.packages):
+                        package = self.choose_next(
+                            truck.current_location, truck.packages, truck.current_time
+                        )
+                        truck.deliver_package(package)
+                    # No more packages, return to HUB.
+                    truck.drive_to(HUB)
+        return
 
     def main(self):
-        total_distance = 0
-        print("Truck 1 -----------------------------------------")
-        total_distance += self.deliver_packages(self.trucks[0])
-        print("Truck 2 -----------------------------------------")
-        total_distance += self.deliver_packages(self.trucks[1])
+        self.deliver_packages(self.trucks)
+
+        self.packages.print_all()
+
+        total_distance = sum([truck.distance_traveled for truck in self.trucks])
         print(f"Total distance traveled {total_distance} miles")
 
 
