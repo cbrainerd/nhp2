@@ -12,7 +12,7 @@ from wgups.truck import Truck, TruckFullException
 
 HUB = "4001 South 700 East 84107"
 NUM_TRUCKS = 2
-RUSH_THRESHOLD = 30
+RUSH_THRESHOLD = 0
 
 
 class Scheduler:
@@ -40,6 +40,9 @@ class Scheduler:
                             continue
                     else:
                         truck.load_package(package, truck.current_time)
+
+            if len(truck.packages):
+                return
 
             for package in self.packages.ready_to_load(truck.current_time):
                 if package.assigned_truck == truck.id:
