@@ -62,7 +62,7 @@ class Scheduler:
                 min_distance = distance
                 closest_package = package
         return closest_package
-    
+
     def choose_earliest_packages(self, packages) -> List[Package]:
         earliest_deadline = datetime.time(23, 59, 59)
         earliest_packages = list()
@@ -76,8 +76,13 @@ class Scheduler:
 
     def choose_next(self, origin, packages, current_time):
         earliest_packages = self.choose_earliest_packages(packages)
-        if add_time(current_time, datetime.timedelta(minutes=RUSH_THRESHOLD)) > earliest_packages[0].deadline:
-            print(f"  RUSH for deadline {earliest_packages[0].deadline} {earliest_packages}")
+        if (
+            add_time(current_time, datetime.timedelta(minutes=RUSH_THRESHOLD))
+            > earliest_packages[0].deadline
+        ):
+            print(
+                f"  RUSH for deadline {earliest_packages[0].deadline} {earliest_packages}"
+            )
             candidate_packages = earliest_packages
         else:
             candidate_packages = packages
@@ -94,13 +99,13 @@ class Scheduler:
                 break
 
             for truck in trucks:
-                    while len(truck.packages):
-                        package = self.choose_next(
-                            truck.current_location, truck.packages, truck.current_time
-                        )
-                        truck.deliver_package(package)
-                    # No more packages, return to HUB.
-                    truck.drive_to(HUB)
+                while len(truck.packages):
+                    package = self.choose_next(
+                        truck.current_location, truck.packages, truck.current_time
+                    )
+                    truck.deliver_package(package)
+                # No more packages, return to HUB.
+                truck.drive_to(HUB)
         return
 
     def main(self):
