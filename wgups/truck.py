@@ -2,7 +2,9 @@ import datetime
 from typing import List
 
 from wgups.distance_table import DistanceTable
+from wgups.logging import LOGGER
 from wgups.time import add_time
+
 
 TRUCK_MPH = 18
 MAX_PACKAGES = 16
@@ -56,7 +58,7 @@ class Truck:
         self.current_location = destination
         self.distance_traveled += distance
         self.current_time = arrival_time
-        print(
+        LOGGER.debug(
             f"Truck {self.id} drove to {destination} at {self.current_time} total distance {round(self.distance_traveled, 1)}"
         )
 
@@ -64,7 +66,7 @@ class Truck:
         self.drive_to(package.get_address())
         package.mark_delivered(self.current_time, self.id)
         self.packages.remove(package)
-        print(
+        LOGGER.debug(
             f"Truck {self.id} delivered package {package.id} at {self.current_time} "
             f"deadline was {package.deadline}"
         )
