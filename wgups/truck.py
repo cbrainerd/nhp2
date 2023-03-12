@@ -3,6 +3,7 @@ from typing import List
 
 from wgups.distance_table import DistanceTable
 from wgups.logging import LOGGER
+from wgups.package import Package
 from wgups.time import add_time
 
 
@@ -34,7 +35,7 @@ class Truck:
         self.current_time = current_time
         self.distance_table = DistanceTable()
 
-    def load_package(self, package, current_time):
+    def load_package(self, package: Package, current_time: datetime.time):
         if len(self.packages) >= MAX_PACKAGES:
             raise TruckFullException
 
@@ -51,8 +52,10 @@ class Truck:
 
         self.packages.append(package)
         package.delivery_truck = self.id
+        package.time_loaded = current_time
+        LOGGER.debug(f"Truck {self.id} loaded {package}")
 
-    def drive_to(self, destination):
+    def drive_to(self, destination: str):
         distance = get_distance(self.current_location, destination)
         arrival_time = get_arrival_time(distance, self.current_time)
         self.current_location = destination
@@ -62,7 +65,7 @@ class Truck:
             f"Truck {self.id} drove to {destination} at {self.current_time} total distance {round(self.distance_traveled, 1)}"
         )
 
-    def deliver_package(self, package):
+    def deliver_package(self, package: Package):
         self.drive_to(package.get_address())
         package.mark_delivered(self.current_time, self.id)
         self.packages.remove(package)

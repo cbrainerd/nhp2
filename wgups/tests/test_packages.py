@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from wgups.packages import Packages, GROUPED_PACKAGE_TRUCK
+from wgups.packages import Packages, EOD, GROUPED_PACKAGE_TRUCK
 
 
 @pytest.fixture
@@ -22,7 +22,7 @@ def test_package_22(packages):
     assert package.city == "Murray"
     assert package.state == "UT"
     assert package.zip == "84121"
-    assert package.deadline == datetime.time(23, 59)
+    assert package.deadline == EOD
     assert package.mass == 2
 
 

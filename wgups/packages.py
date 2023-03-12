@@ -2,16 +2,18 @@ from csv import reader
 import datetime
 import os
 import time
+from typing import List
 
 from wgups.hash_map import HashMap
 from wgups.constraint import Constraint
+from wgups.logging import LOGGER
 from wgups.package import Package
+from wgups.time import EOD
 
 GROUPED_PACKAGE_TRUCK = 1
 
-
 class Packages:
-    def __init__(self, data_path=None):
+    def __init__(self, data_path: str = None):
         if data_path is None:
             data_path = os.path.join(
                 os.path.dirname(__file__), "data", "package_table.csv"
@@ -31,7 +33,7 @@ class Packages:
                 constraint_description = package.pop(0)
 
                 if raw_deadline == "EOD":
-                    deadline = datetime.time(23, 59)
+                    deadline = EOD
                 else:
                     deadline = time.strptime(raw_deadline, "%H:%M %p")
                     deadline = datetime.time(deadline.tm_hour, deadline.tm_min)
@@ -55,16 +57,19 @@ class Packages:
                         with_package_id
                     ].constraint.assigned_truck = GROUPED_PACKAGE_TRUCK
 
-    def get(self, id):
+    def get(self, id: int) -> Package:
         return self.__getitem__(id)
 
-    def __getitem__(self, id):
+    def __getitem__(self, id: int) -> Package:
         return self._packages[id]
 
     def items(self):
         return self._packages.items()
+    
+    def sorted_items(self):
+        return sorted(self._packages.items(), key=lambda x: x.id)
 
-    def ready_to_load(self, current_time):
+    def ready_to_load(self, current_time: datetime.time) -> List[Package]:
         """Packages that are ready for pick up the current time and not already loaded on a truck"""
         ready = list()
         for package in self.items():
@@ -74,8 +79,24 @@ class Packages:
                 continue
             ready.append(package)
         return ready
+    
+    def packages_in_hub(self) -> List[Package]:
+        in_hub = list()
+        for package in self.items():
+            if package.delivery_truck is None:
+                in_hub.append(package)
+        return in_hub
+    
+    def latest_load(self) -> datetime.time:
+        """Returns the latest pickup time for packages not yet loaded on a truck"""
+        latest_load = datetime.time(0, 0)
+        for package in self.items():
+            if package.delivery_truck is None and package.earliest_load > latest_load:
+                latest_load = package.earliest_load
+        return latest_load
 
-    def print_all(self):
-        for package_id in sorted(list(self._packages.keys())):
-            package = self._packages[package_id]
-            print(f"{package}")
+    def print_at_time(self, time: datetime.time):
+        print(f"\nPackage status report for {time}")
+        print("----------------------------------")
+        for package in self.sorted_items():
+            print(f"id: {package.id:2} - status: {package.status(time)}")

@@ -1,7 +1,7 @@
 import datetime
 
 from wgups.constraint import Constraint
-
+from wgups.time import EOD
 
 class Package:
     def __init__(
@@ -29,6 +29,7 @@ class Package:
 
         self.delivery_time: datetime.time = None
         self.delivery_truck: datetime.time = None
+        self.time_loaded: datetime.time = None
 
     def get_address(self):
         return f"{self.address} {self.zip}"
@@ -64,10 +65,23 @@ class Package:
             if self.delivery_time > self.deadline:
                 status += " *LATE*"
         elif self.delivery_time is None and self.delivery_truck is not None:
-            status = f"enroute on truck {self.delivery_truck} for delivery by {self.deadline}"
+            status = f"enroute on truck {self.delivery_truck} loaded at {self.time_loaded} for delivery by {self.deadline}"
         elif self.delivery_truck is None:
             status = f"at HUB"
-        return f"{self.id} - {status}"
+        return f"{self.id} - {status} - due at {self.deadline}"
 
     def __repr__(self):
         return self.__str__()
+
+    def status(self, current_time: datetime.time):
+        if current_time >= self.delivery_time:
+            late = " *LATE*" if self.delivery_time > self.deadline else ""
+            status = f"DELIVERED by truck {self.delivery_truck} at {self.delivery_time}{late}"
+        elif current_time >= self.time_loaded:
+            deadline = "EOD" if self.deadline == EOD else self.deadline
+            status = f"ENROUTE on truck {self.delivery_truck} loaded at {self.time_loaded} for delivery by {deadline}"
+        elif current_time >= self.earliest_load:
+            status = f"AT HUB - available for loading"
+        else:
+            status = f"AT HUB - available for loading at {self.earliest_load}"
+        return status
