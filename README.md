@@ -6,6 +6,10 @@ To run the program:
 
     python -m wgups
 
+## Run with debug output enabled
+
+    python -m wgups -d
+
 
 ## Development
 

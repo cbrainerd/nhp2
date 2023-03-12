@@ -36,6 +36,7 @@ class Truck:
         self.distance_table = DistanceTable()
 
     def load_package(self, package: Package, current_time: datetime.time):
+        """Load package onto truck."""
         if len(self.packages) >= MAX_PACKAGES:
             raise TruckFullException
 
@@ -56,6 +57,7 @@ class Truck:
         LOGGER.debug(f"Truck {self.id} loaded {package}")
 
     def drive_to(self, destination: str):
+        """Drive to destination and update current_location, distance_traveled and current_time"""
         distance = get_distance(self.current_location, destination)
         arrival_time = get_arrival_time(distance, self.current_time)
         self.current_location = destination
@@ -66,6 +68,7 @@ class Truck:
         )
 
     def deliver_package(self, package: Package):
+        """Drive to package destination and deliver package."""
         self.drive_to(package.get_address())
         package.mark_delivered(self.current_time, self.id)
         self.packages.remove(package)

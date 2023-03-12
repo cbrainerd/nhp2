@@ -15,6 +15,7 @@ class Constraint:
         with_packages: Set[int] = None,
         from_description: str = None,
     ):
+        # Parses a textual from_description into the constraint.
         if from_description is not None:
             if from_description.startswith("Can only be on truck"):
                 assigned_truck = int(from_description.split(" ")[-1])

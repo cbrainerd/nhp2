@@ -25,7 +25,10 @@ class Scheduler:
         ]
 
     def load_packages(self, truck: Truck):
+        """Load a truck with packages from the hub."""
         LOGGER.debug(f"Loading truck {truck.id} at {truck.current_time}")
+        if truck.current_location != HUB:
+            raise RuntimeError("Attempt to load truck that isn't at HUB")
         try:
             # Tranche 1: load packages with earliest deadlines
             for package in self.packages.ready_to_load(truck.current_time):
@@ -59,6 +62,7 @@ class Scheduler:
             LOGGER.debug(f"Truck {truck.id} is fully loaded.")
 
     def choose_next(self, origin: str, packages: List[Package]) -> Package:
+        """Chose the closest package to origin."""
         min_distance = math.inf
         closest_package = None
         # Iterate over packages and find the package closest to the origin.
@@ -70,6 +74,7 @@ class Scheduler:
         return closest_package
 
     def deliver_packages(self, trucks: List[Truck]):
+        """Main load-delivery loop."""
         while True:
             for truck in trucks:
                 while len(self.packages.packages_in_hub()) > 0:
@@ -78,8 +83,10 @@ class Scheduler:
                         # Loading complete.
                         break
                     # Nothing loaded, no packages currently meet criteria to be loaded. Wait a few
-                    # minutes and check again. 
-                    truck.current_time = add_time(truck.current_time, datetime.timedelta(minutes=5))
+                    # minutes and check again.
+                    truck.current_time = add_time(
+                        truck.current_time, datetime.timedelta(minutes=5)
+                    )
 
             if sum(len(truck.packages) for truck in trucks) == 0:
                 # No packages loaded on any truck, we're done.
@@ -92,17 +99,18 @@ class Scheduler:
                 # No more packages, return to HUB.
                 truck.drive_to(HUB)
         return
-    
+
     def total_distance(self):
+        """Print the total distance traveled by all trucks."""
         distance = sum([truck.distance_traveled for truck in self.trucks])
         print(f"Trucks traveled a total distance of {distance} miles.")
 
-    def time_status(self, time: datetime.time):
-        self.packages.print_at_time(time)
-
     def main(self):
+        # Execute the main delivery loop to determine trucks loads, routings,
+        # delivery times, etc.
         self.deliver_packages(self.trucks)
 
+        # Present the user interface.
         while True:
             print("\nWGUPS")
             print("---------------------------------------")
@@ -113,17 +121,18 @@ class Scheduler:
             print("---------------------------------------")
             command = input("Choose an option: ")
             if command == "a":
-                self.time_status(EOD)
+                self.packages.print_at_time(EOD)
             elif command == "d":
                 self.total_distance()
             elif command == "t":
                 input_string = input("Enter time HH:MM: ")
                 time = parse_time(input_string)
-                self.time_status(time)
+                self.packages.print_at_time(time)
             elif command == "q":
                 break
             else:
                 print("Invalid entry - try again")
+
 
 def main():
     Scheduler().main()

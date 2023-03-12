@@ -3,6 +3,7 @@ import datetime
 from wgups.constraint import Constraint
 from wgups.time import EOD
 
+
 class Package:
     def __init__(
         self,
@@ -32,14 +33,17 @@ class Package:
         self.time_loaded: datetime.time = None
 
     def get_address(self):
+        """Return package address in "address zip" format."""
         return f"{self.address} {self.zip}"
 
     def mark_delivered(self, delivery_time, delivery_truck):
+        """Called when package has been delivered to destination."""
         self.delivery_time = delivery_time
         self.delivery_truck = delivery_truck
 
     @property
     def earliest_load(self):
+        """Earliest time that a package can be loaded at HUB."""
         if not self.constraint or self.constraint.earliest_pickup is None:
             return datetime.time(0, 0)
         else:
@@ -47,6 +51,7 @@ class Package:
 
     @property
     def assigned_truck(self):
+        """Indicates truck ID that must carry this package."""
         if not self.constraint or self.constraint.assigned_truck is None:
             return None
         else:
@@ -54,6 +59,7 @@ class Package:
 
     @property
     def with_packages(self):
+        """Packages that must be delivered by the same truck."""
         if not self.constraint or self.constraint.with_packages is None:
             return None
         else:
@@ -74,6 +80,7 @@ class Package:
         return self.__str__()
 
     def status(self, current_time: datetime.time):
+        """Returns a human readable description of the package status."""
         if current_time >= self.delivery_time:
             late = " *LATE*" if self.delivery_time > self.deadline else ""
             status = f"DELIVERED by truck {self.delivery_truck} at {self.delivery_time}{late}"

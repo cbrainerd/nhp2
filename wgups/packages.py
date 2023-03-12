@@ -10,7 +10,10 @@ from wgups.logging import LOGGER
 from wgups.package import Package
 from wgups.time import EOD
 
+# Truck designated to handle grouped packages
+# (package x must be delivered with package y)
 GROUPED_PACKAGE_TRUCK = 1
+
 
 class Packages:
     def __init__(self, data_path: str = None):
@@ -38,6 +41,7 @@ class Packages:
                     deadline = time.strptime(raw_deadline, "%H:%M %p")
                     deadline = datetime.time(deadline.tm_hour, deadline.tm_min)
 
+                # Parse any special instructions into a constraint.
                 if constraint_description:
                     constraint = Constraint(from_description=constraint_description)
                 else:
@@ -63,14 +67,15 @@ class Packages:
     def __getitem__(self, id: int) -> Package:
         return self._packages[id]
 
-    def items(self):
+    def items(self) -> List[Package]:
+        """Returns all packages."""
         return self._packages.items()
-    
-    def sorted_items(self):
+
+    def sorted_items(self) -> List[Package]:
         return sorted(self._packages.items(), key=lambda x: x.id)
 
     def ready_to_load(self, current_time: datetime.time) -> List[Package]:
-        """Packages that are ready for pick up the current time and not already loaded on a truck"""
+        """Packages that are ready for pick up the current time and not already loaded on a truck."""
         ready = list()
         for package in self.items():
             if package.delivery_truck is not None:
@@ -79,14 +84,15 @@ class Packages:
                 continue
             ready.append(package)
         return ready
-    
+
     def packages_in_hub(self) -> List[Package]:
+        """Returns all packages in the hub."""
         in_hub = list()
         for package in self.items():
             if package.delivery_truck is None:
                 in_hub.append(package)
         return in_hub
-    
+
     def latest_load(self) -> datetime.time:
         """Returns the latest pickup time for packages not yet loaded on a truck"""
         latest_load = datetime.time(0, 0)

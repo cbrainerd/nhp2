@@ -25,10 +25,12 @@ class HashMap:
         bucket = self._bucket(key)
         for item in bucket:
             if item.key == key:
+                # Key already exists in hash table, replace the entry.
                 bucket.remove(item)
                 bucket.append(new_item)
                 break
         else:
+            # Create a new entry.
             self._buckets[self._index(key)].append(new_item)
 
     def __getitem__(self, key):
@@ -40,6 +42,7 @@ class HashMap:
                 default_value = self._default()
                 self.__setitem__(key, default_value)
                 return default_value
+            # Not found, raise exception.
             raise KeyError(key)
 
     def __contains__(self, key):

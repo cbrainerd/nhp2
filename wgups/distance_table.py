@@ -30,11 +30,11 @@ class DistanceTable:
                 for address in addresses:
                     # Store distance for each address we've already seen.
                     self._distance_table[start_address][address] = float(row.pop(0))
-
         # Table loading is done, don't create any more default entries.
         self._distance_table.set_default(None)
 
     def get_distance(self, origin: str, destination: str) -> float:
+        """Get the distance between origin and destination."""
         if origin not in self._distance_table:
             raise ValueError(f"origin {origin} not found")
         if destination not in self._distance_table:
