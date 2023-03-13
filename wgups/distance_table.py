@@ -2,7 +2,7 @@ from csv import reader
 import os
 import re
 
-from wgups.hash_map import HashMap
+from wgups.hash_table import HashTable
 
 
 # Parse addresses with format
@@ -18,7 +18,7 @@ class DistanceTable:
             )
 
         # Set default as each value will be another HashMap.
-        self._distance_table = HashMap(default=HashMap)
+        self._distance_table = HashTable(default=HashTable)
 
         rgx_address = re.compile(RGX_ADDRESS)
         with open(data_path, "r", encoding="utf-8") as csv_file:

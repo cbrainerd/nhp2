@@ -1,16 +1,16 @@
 import pytest
 
-from wgups.hash_map import HashMap
+from wgups.hash_table import HashTable
 
 
 @pytest.fixture
 def hashmap():
-    return populate_hashmap(HashMap())
+    return populate_hashmap(HashTable())
 
 
 @pytest.fixture
 def collision_hashmap():
-    return HashMap(size=1)
+    return HashTable(size=1)
 
 
 def populate_hashmap(empty_hashmap):
@@ -21,7 +21,7 @@ def populate_hashmap(empty_hashmap):
 
 
 def test_empty():
-    assert not any([x for x in HashMap()._buckets])
+    assert not any([x for x in HashTable()._buckets])
 
 
 def test_setitem(hashmap):
@@ -46,7 +46,7 @@ def test_replace_item(hashmap):
 
 
 def test_collision():
-    hashmap = HashMap(size=1)
+    hashmap = HashTable(size=1)
     populate_hashmap(hashmap)
 
     assert len(hashmap._bucket(1)) == 3
@@ -56,7 +56,7 @@ def test_collision():
 
 
 def test_collision_replace():
-    hashmap = HashMap(size=1)
+    hashmap = HashTable(size=1)
     populate_hashmap(hashmap)
     hashmap[2] = "updated"
 

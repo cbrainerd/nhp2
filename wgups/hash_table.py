@@ -4,7 +4,7 @@ from typing import Callable
 Item = namedtuple("Item", "key value")
 
 
-class HashMap:
+class HashTable:
     def __init__(self, size: int = 10, default: Callable = None):
         self.size = size
         self._default = default

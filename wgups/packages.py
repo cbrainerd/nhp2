@@ -4,7 +4,7 @@ import os
 import time
 from typing import List
 
-from wgups.hash_map import HashMap
+from wgups.hash_table import HashTable
 from wgups.constraint import Constraint
 from wgups.logging import LOGGER
 from wgups.package import Package
@@ -22,9 +22,10 @@ class Packages:
                 os.path.dirname(__file__), "data", "package_table.csv"
             )
 
+        # Load the packages hash table from the CSV data file.
         with open(data_path, "r", encoding="utf-8") as csv_file:
             data = reader(csv_file)
-            self._packages = HashMap()
+            self._packages = HashTable()
             for package in data:
                 id = int(package.pop(0))
                 address = package.pop(0)
